@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/TutorPlatform.Api/TutorPlatform.Api.csproj" />
+    <Project Path="src/TutorPlatform.Core/TutorPlatform.Core.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/TutorPlatform.Core.Tests/TutorPlatform.Core.Tests.csproj" />
+  </Folder>
+</Solution>
