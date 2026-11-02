@@ -2,7 +2,7 @@
 
 public enum LessonStatus
 {
+    Planned,
     Completed,
-    Postponed,
     Canceled
 }
