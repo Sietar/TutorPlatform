@@ -1,17 +1,112 @@
-﻿namespace TutorPlatform.Core.Tests;
+﻿using TutorPlatform.Core.Entities;
+using TutorPlatform.Core.Enums;
+
+namespace TutorPlatform.Core.Tests;
 
 public class LessonTests
 {
-    /*Write tests for overlapping lessons, that canceled lessons don't block anything and that two consequential lessons possible
-     (one ends at 15:00 and the next one starts at 15:00). 
-     
-     Assure that lessons statuses change correctly (Canceled can't become completed or planned, completed can't be canceled or planned)
-     
-     */
+    private static readonly DateTime _date = new (2016, 1, 1, 12, 0, 0);
+    private readonly Lesson _lesson = new (Guid.NewGuid(), Guid.NewGuid(), _date, TimeSpan.FromHours(1));
 
     [Fact]
-    public void AddLesson_LessonsCantOverlap_Throws()
+    public void Constructor_InvalidTeacherId_Throws()
     {
+        Assert.Throws<DomainException>(() => new Lesson(Guid.Empty, Guid.NewGuid(), _date, TimeSpan.FromHours(1)));
+    }
+    
+    [Fact]
+    public void Constructor_InvalidStudentId_Throws()
+    {
+        Assert.Throws<DomainException>(() => new Lesson(Guid.NewGuid(), Guid.Empty, _date, TimeSpan.FromHours(1)));
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    [InlineData(-202)]
+    [InlineData(-43)]
+    public void Constructor_InvalidDuration_Throws(int duration)
+    {
+        Assert.Throws<DomainException>(() => new Lesson(Guid.NewGuid(), Guid.NewGuid(), _date,
+            TimeSpan.FromHours(duration)));
+    }
+
+    [Theory]
+    [InlineData(30)]
+    [InlineData(10)]
+    [InlineData(25)]
+    public void IsAwaitingMark_WhenNotExceedThirtyMin_ReturnsFalse(int minutes)
+    {
+        var timeAfterEnd = new DateTime(2016, 1, 1, 13, minutes, 0);
+        Assert.False(_lesson.IsAwaitingMark(timeAfterEnd));
+    }
+    [Theory]
+    [InlineData(31)]
+    [InlineData(33)]
+    [InlineData(45)]
+    public void IsAwaitingMark_WhenExceedThirtyMin_ReturnsTrue(int minutes)
+    {
+        var timeAfterEnd = new DateTime(2016, 1, 1, 13, minutes, 0);
+        Assert.True(_lesson.IsAwaitingMark(timeAfterEnd));
+    }
+
+    [Fact]
+    public void IsAwaitingMark_WhenCanceled_ReturnsFalse()
+    {
+        _lesson.Cancel();
+        Assert.False(_lesson.IsAwaitingMark(_date + TimeSpan.FromHours(1.6)));
+    }
+    
+    [Fact]
+    public void IsAwaitingMark_WhenCompleted_ReturnsFalse()
+    {
+        _lesson.Complete();
+        Assert.False(_lesson.IsAwaitingMark(_date + TimeSpan.FromHours(1.6)));
+    }
+    
+    
+    
+    [Fact]
+    public void Complete_WhenPlanned_SetsCompleted()
+    {
+        _lesson.Complete();
         
+        Assert.Equal(LessonStatus.Completed, _lesson.Status);
+    }
+    
+    [Fact]
+    public void Cancel_WhenPlanned_SetsCanceled()
+    {
+        _lesson.Cancel();
+        
+        Assert.Equal(LessonStatus.Canceled, _lesson.Status);
+    }
+
+    [Fact]
+    public void Complete_WhenCompleted_Throws()
+    {
+        _lesson.Complete();
+        Assert.Throws<DomainException>(_lesson.Complete);
+    }
+    
+    [Fact]
+    public void Complete_WhenCanceled_Throws()
+    {
+        _lesson.Cancel();
+        Assert.Throws<DomainException>(_lesson.Complete);
+    }
+    
+    [Fact]
+    public void Cancel_WhenCanceled_Throws()
+    {
+        _lesson.Cancel();
+        Assert.Throws<DomainException>(_lesson.Cancel);
+    }
+    
+    [Fact]
+    public void Cancel_WhenCompleted_Throws()
+    {
+        _lesson.Complete();
+        Assert.Throws<DomainException>(_lesson.Cancel);
     }
 }

@@ -9,6 +9,10 @@ public static class LessonScheduler
     {
         foreach (var existing in lessonsPlanned)
         {
+            if (existing.Id == lesson.Id)
+            {
+                continue;
+            }
             if (existing.Status == LessonStatus.Canceled)
             {
                 continue;
