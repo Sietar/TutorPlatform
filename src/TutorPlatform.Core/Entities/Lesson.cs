@@ -28,10 +28,7 @@ public class Lesson
         }
         StudentId = studentId;
         Start = date;
-        if (duration <= TimeSpan.Zero)
-        {
-            throw new DomainException("Duration must be greater than zero.");
-        }
+        EnsureCorrectDuration(duration);
         Duration = duration;
         Status = LessonStatus.Planned;
     }
@@ -50,6 +47,14 @@ public class Lesson
         Status = LessonStatus.Canceled;
     }
 
+    public void Reschedule(DateTime newStart, TimeSpan newDuration)
+    {
+        EnsurePlanned();
+        EnsureCorrectDuration(newDuration);
+        Start = newStart;
+        Duration = newDuration;
+    }
+
     private void EnsurePlanned()
     {
         if (Status != LessonStatus.Planned)
@@ -58,5 +63,11 @@ public class Lesson
         }
     }
     
-    
+    private void EnsureCorrectDuration(TimeSpan duration)
+    {
+        if (duration <= TimeSpan.Zero)
+        {
+            throw new DomainException("Duration must be greater than zero.");
+        }
+    }
 }

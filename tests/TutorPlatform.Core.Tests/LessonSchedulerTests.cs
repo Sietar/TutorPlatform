@@ -5,6 +5,17 @@ namespace TutorPlatform.Core.Tests;
 public class LessonSchedulerTests
 {
     [Fact]
+    public void EnsureNoConflicts_WhenLessonRescheduledOverOwnSlot_DoesNotThrow()
+    {
+        var lesson = CreateLesson(11, 16, 0, 1);
+        List<Lesson> lessons = [lesson];
+
+        lesson.Reschedule(lesson.Start.AddMinutes(30), TimeSpan.FromHours(1));
+
+        LessonScheduler.EnsureNoConflicts(lesson, lessons);
+    }
+    
+    [Fact]
     public void EnsureNoConflicts_LessonsCantOverlap_Throws()
     {
         

@@ -5,19 +5,19 @@ namespace TutorPlatform.Core.Tests;
 
 public class LessonTests
 {
-    private static readonly DateTime _date = new (2016, 1, 1, 12, 0, 0);
-    private readonly Lesson _lesson = new (Guid.NewGuid(), Guid.NewGuid(), _date, TimeSpan.FromHours(1));
+    private static readonly DateTime Date = new (2016, 1, 1, 12, 0, 0);
+    private readonly Lesson _lesson = new (Guid.NewGuid(), Guid.NewGuid(), Date, TimeSpan.FromHours(1));
 
     [Fact]
     public void Constructor_InvalidTeacherId_Throws()
     {
-        Assert.Throws<DomainException>(() => new Lesson(Guid.Empty, Guid.NewGuid(), _date, TimeSpan.FromHours(1)));
+        Assert.Throws<DomainException>(() => new Lesson(Guid.Empty, Guid.NewGuid(), Date, TimeSpan.FromHours(1)));
     }
     
     [Fact]
     public void Constructor_InvalidStudentId_Throws()
     {
-        Assert.Throws<DomainException>(() => new Lesson(Guid.NewGuid(), Guid.Empty, _date, TimeSpan.FromHours(1)));
+        Assert.Throws<DomainException>(() => new Lesson(Guid.NewGuid(), Guid.Empty, Date, TimeSpan.FromHours(1)));
     }
 
     [Theory]
@@ -27,7 +27,7 @@ public class LessonTests
     [InlineData(-43)]
     public void Constructor_InvalidDuration_Throws(int duration)
     {
-        Assert.Throws<DomainException>(() => new Lesson(Guid.NewGuid(), Guid.NewGuid(), _date,
+        Assert.Throws<DomainException>(() => new Lesson(Guid.NewGuid(), Guid.NewGuid(), Date,
             TimeSpan.FromHours(duration)));
     }
 
@@ -54,14 +54,14 @@ public class LessonTests
     public void IsAwaitingMark_WhenCanceled_ReturnsFalse()
     {
         _lesson.Cancel();
-        Assert.False(_lesson.IsAwaitingMark(_date + TimeSpan.FromHours(1.6)));
+        Assert.False(_lesson.IsAwaitingMark(Date + TimeSpan.FromHours(1.6)));
     }
     
     [Fact]
     public void IsAwaitingMark_WhenCompleted_ReturnsFalse()
     {
         _lesson.Complete();
-        Assert.False(_lesson.IsAwaitingMark(_date + TimeSpan.FromHours(1.6)));
+        Assert.False(_lesson.IsAwaitingMark(Date + TimeSpan.FromHours(1.6)));
     }
     
     
@@ -108,5 +108,38 @@ public class LessonTests
     {
         _lesson.Complete();
         Assert.Throws<DomainException>(_lesson.Cancel);
+    }
+
+    [Fact]
+    public void Reschedule_WhenValid_ChangesDateAndDuration()
+    {
+        var newDate = Date.AddHours(5);
+        _lesson.Reschedule(newDate, TimeSpan.FromHours(2));
+        
+        Assert.Equal(newDate, _lesson.Start);
+        Assert.Equal(TimeSpan.FromHours(2), _lesson.Duration);
+    }
+    
+    [Fact]
+    public void Reschedule_WhenCanceled_Throws()
+    {
+        _lesson.Cancel();
+        Assert.Throws<DomainException>(() => _lesson.Reschedule(Date, TimeSpan.FromHours(1.6)));
+    }
+
+    [Fact]
+    public void Reschedule_WhenCompleted_Throws()
+    {
+        _lesson.Complete();
+        Assert.Throws<DomainException>(() => _lesson.Reschedule(Date, TimeSpan.FromHours(1.6)));
+    }
+    
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    [InlineData(-202)]
+    public void Reschedule_WhenInvalidDuration_Throws(int duration)
+    {
+        Assert.Throws<DomainException>(() => _lesson.Reschedule(Date, TimeSpan.FromHours(duration)));
     }
 }
