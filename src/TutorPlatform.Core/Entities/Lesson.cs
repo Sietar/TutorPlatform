@@ -16,6 +16,10 @@ public class Lesson
 
     public Lesson(Guid teacherId, Guid studentId, DateTime date, TimeSpan duration)
     {
+        if (date.Kind != DateTimeKind.Utc)
+        {
+            throw new DomainException("Date must be UTC.");
+        }
         Id = Guid.CreateVersion7();
         if (teacherId == Guid.Empty)
         {
@@ -49,6 +53,7 @@ public class Lesson
 
     public void Reschedule(DateTime newStart, TimeSpan newDuration)
     {
+        EnsureCorrectTimeKind(newStart.Kind);
         EnsurePlanned();
         EnsureCorrectDuration(newDuration);
         Start = newStart;
@@ -70,4 +75,13 @@ public class Lesson
             throw new DomainException("Duration must be greater than zero.");
         }
     }
+
+    private void EnsureCorrectTimeKind(DateTimeKind kind)
+    {
+        if (kind is not DateTimeKind.Utc)
+        {
+            throw new DomainException("Date time kind must be UTC.");
+        }
+    }
+    
 }

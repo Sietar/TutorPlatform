@@ -126,7 +126,7 @@ public class LessonSchedulerTests
 
     private Lesson CreateLesson(int day, int hour, int minute, double duration)
     {
-        return new Lesson(Guid.NewGuid(), Guid.NewGuid(), new DateTime(2026, 11, day, hour, minute, 00), 
+        return new Lesson(Guid.NewGuid(), Guid.NewGuid(), new DateTime(2026, 11, day, hour, minute, 00, DateTimeKind.Utc), 
             TimeSpan.FromHours(duration));
     }
 }
