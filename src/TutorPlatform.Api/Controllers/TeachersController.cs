@@ -34,6 +34,25 @@ public class TeachersController (AppDbContext db) : ControllerBase
         return teacher is null ? NotFound() : Ok(teacher);
     }
 
+    [HttpGet("{teacherId:guid}/students")]
+    public async Task<ActionResult<List<StudentResponse>>> GetStudents(Guid teacherId)
+    {
+        if (!await db.Teachers.AnyAsync(t => t.Id == teacherId))
+        {
+            return NotFound();
+        }
+        
+        var students = await db.Students
+            .AsNoTracking()
+            .Where(s => s.Teacher!.Id == teacherId)
+            .Select(s => new StudentResponse(s.Id, s.Name))
+            .ToListAsync();
+        
+        
+        
+        return Ok(students);
+    }
+
     [HttpPost]
     public async Task<ActionResult<TeacherResponse>> Create(CreateTeacherRequest request)
     {
@@ -50,5 +69,40 @@ public class TeachersController (AppDbContext db) : ControllerBase
         await db.SaveChangesAsync();
         var response = new TeacherResponse(teacher.Id, teacher.Name);
         return CreatedAtAction(nameof(GetById), new { id = teacher.Id }, response);
+    }
+
+    [HttpPost("{teacherId:guid}/students")]
+    public async Task<ActionResult<StudentResponse>> AddStudent(Guid teacherId, AddStudentRequest request)
+    {
+        var teacher = await db.Teachers
+            .Include(t => t.Students)
+            .FirstOrDefaultAsync(t => t.Id == teacherId); 
+
+        if (teacher is null)
+        {
+            return NotFound();
+        }
+        
+        Student student;
+        try
+        {
+            student = new Student(request.UserId, request.Name);
+        }
+        catch (DomainException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+
+        try
+        {
+            teacher.AddStudent(student);
+        }
+        catch (DomainException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+
+        await db.SaveChangesAsync();
+        return Ok(new StudentResponse(student.Id, student.Name));
     }
 }
