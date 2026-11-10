@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using TutorPlatform.Api.Data;
+using TutorPlatform.Api.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,7 +13,13 @@ builder.Services.AddOpenApi();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
 
+builder.Services.AddExceptionHandler<ApiExceptionHandler>();
+
+builder.Services.AddProblemDetails();
+
 var app = builder.Build();
+
+app.UseExceptionHandler();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
