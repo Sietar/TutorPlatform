@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using TutorPlatform.Api.Contracts;
 using TutorPlatform.Api.Data;
-using TutorPlatform.Core;
 using TutorPlatform.Core.Entities;
 
 namespace TutorPlatform.Api.Controllers;
@@ -56,15 +55,8 @@ public class TeachersController (AppDbContext db) : ControllerBase
     [HttpPost]
     public async Task<ActionResult<TeacherResponse>> Create(CreateTeacherRequest request)
     {
-        Teacher teacher;
-        try
-        {
-            teacher = new Teacher(request.UserId, request.Name);
-        }
-        catch (DomainException ex)
-        {
-            return BadRequest(ex.Message);
-        }
+        var teacher = new Teacher(request.UserId, request.Name);
+        
         db.Add(teacher);
         await db.SaveChangesAsync();
         var response = new TeacherResponse(teacher.Id, teacher.Name);
@@ -82,25 +74,10 @@ public class TeachersController (AppDbContext db) : ControllerBase
         {
             return NotFound();
         }
-        
-        Student student;
-        try
-        {
-            student = new Student(request.UserId, request.Name);
-        }
-        catch (DomainException ex)
-        {
-            return BadRequest(ex.Message);
-        }
 
-        try
-        {
-            teacher.AddStudent(student);
-        }
-        catch (DomainException ex)
-        {
-            return BadRequest(ex.Message);
-        }
+        var student = new Student(request.UserId, request.Name);
+        
+        teacher.AddStudent(student);
 
         await db.SaveChangesAsync();
         return Ok(new StudentResponse(student.Id, student.Name));
