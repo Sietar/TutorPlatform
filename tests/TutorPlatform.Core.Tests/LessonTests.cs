@@ -47,12 +47,12 @@ public class LessonTests
         Assert.False(_lesson.IsAwaitingMark(timeAfterEnd));
     }
     [Theory]
-    [InlineData(31)]
-    [InlineData(33)]
-    [InlineData(45)]
-    public void IsAwaitingMark_WhenExceedThirtyMin_ReturnsTrue(int minutes)
+    [InlineData(15)]
+    [InlineData(16)]
+    [InlineData(19)]
+    public void IsAwaitingMark_WhenExceedTwoHours_ReturnsTrue(int hours)
     {
-        var timeAfterEnd = new DateTime(2016, 1, 1, 13, minutes, 0);
+        var timeAfterEnd = new DateTime(2016, 1, 1, hours, 01, 0);
         Assert.True(_lesson.IsAwaitingMark(timeAfterEnd));
     }
 
