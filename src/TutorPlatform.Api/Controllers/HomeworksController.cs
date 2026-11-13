@@ -14,16 +14,17 @@ public class HomeworksController (AppDbContext db) : ControllerBase
     private readonly DateTime _now = DateTime.UtcNow;
     
     [HttpGet]
-    public async Task<ActionResult<List<HomeworkResponse>>> Get([FromQuery] Guid id)
+    public async Task<ActionResult<List<HomeworkResponse>>> Get(
+        [FromQuery] Guid? studentId, [FromQuery] Guid? teacherId)
     {
-        if (id.Equals(Guid.Empty))
+        if (studentId.Equals(Guid.Empty) &&  teacherId.Equals(Guid.Empty))
         {
             return BadRequest("Student id is required");
         }
         
         var homeworks = await db.Homeworks
             .AsNoTracking()
-            .Where(h => h.StudentId == id || h.TeacherId == id)
+            .Where(h => h.StudentId == studentId || h.TeacherId == teacherId)
             .OrderBy(h => h.DueDate)
             .Select(l => HomeworkResponse.From(l, _now))
             .ToListAsync();
@@ -65,7 +66,7 @@ public class HomeworksController (AppDbContext db) : ControllerBase
         }
 
         var homework = new Homework(request.TeacherId, request.StudentId, request.Title, request.Description,
-            DateTime.UtcNow, request.DueDate, request.materialsUrl);
+            DateTime.UtcNow, request.DueDate, request.MaterialsUrl);
         
         db.Homeworks.Add(homework);
         await db.SaveChangesAsync();
