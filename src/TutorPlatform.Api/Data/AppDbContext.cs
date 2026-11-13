@@ -8,6 +8,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Teacher> Teachers => Set<Teacher>();
     public DbSet<Student> Students => Set<Student>();
     public DbSet<Lesson> Lessons => Set<Lesson>();
+    public DbSet<Homework>  Homeworks => Set<Homework>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
