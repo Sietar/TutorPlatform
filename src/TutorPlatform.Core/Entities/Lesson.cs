@@ -73,6 +73,11 @@ public class Lesson
         {
             throw new DomainException("Duration must be greater than zero.");
         }
+
+        if (duration > TimeSpan.FromHours(6))
+        {
+            throw new DomainException("Duration must be less than 6 hours.");
+        }
     }
 
     private void EnsureCorrectTimeKind(DateTimeKind kind)

@@ -1,3 +1,3 @@
 ﻿namespace TutorPlatform.Api.Contracts;
 
-public record CreateHomeworkRequest(Guid TeacherId, Guid StudentId, string Title, string? Description, DateTime DueDate, string materialUrl = "");
+public record CreateHomeworkRequest(Guid TeacherId, Guid StudentId, string Title, string? Description, DateTime DueDate, string materialsUrl = "");

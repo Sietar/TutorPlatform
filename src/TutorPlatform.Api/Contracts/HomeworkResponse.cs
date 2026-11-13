@@ -12,13 +12,18 @@ public record HomeworkResponse(
     DateTime CreatedAt,
     DateTime DueDate,
     HomeworkStatus Status,
-    string Answer = "",
-    string Comment = "",
-    string MaterialsUrl = "")
+    bool IsOverdue,
+    string? Answer,
+    string? Comment,
+    string? MaterialsUrl)
 {
-    public static HomeworkResponse From(Homework homework)
+    public static HomeworkResponse From(Homework homework, DateTime now)
     {
-        return new HomeworkResponse(homework.Id, homework.TeacherId, homework.StudentId, homework.Title, homework.Description,
-            homework.CreatedAt, homework.DueDate, homework.Status, homework.Answer, homework.Comment, homework.MaterialsUrl);
+        return new HomeworkResponse(
+            homework.Id, homework.TeacherId, homework.StudentId,
+            homework.Title, homework.Description,
+            homework.CreatedAt, homework.DueDate, homework.Status,
+            homework.IsOverdue(now),
+            homework.Answer, homework.Comment, homework.MaterialsUrl);
     }
 }
