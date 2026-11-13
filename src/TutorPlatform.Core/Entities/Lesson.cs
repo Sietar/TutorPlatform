@@ -11,8 +11,7 @@ public class Lesson
     public DateTime Start { get; private set; }
     public TimeSpan Duration { get; private set; }
     public DateTime End => Start + Duration;
-
-    public bool IsAwaitingMark(DateTime now) => Status == LessonStatus.Planned && now > End + TimeSpan.FromMinutes(30);
+    public bool IsAwaitingMark(DateTime now) => Status == LessonStatus.Planned && now > End + TimeSpan.FromHours(2);
 
     public Lesson(Guid teacherId, Guid studentId, DateTime date, TimeSpan duration)
     {
