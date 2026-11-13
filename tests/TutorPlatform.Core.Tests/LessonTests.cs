@@ -38,12 +38,11 @@ public class LessonTests
     }
 
     [Theory]
-    [InlineData(30)]
-    [InlineData(10)]
-    [InlineData(25)]
-    public void IsAwaitingMark_WhenNotExceedThirtyMin_ReturnsFalse(int minutes)
+    [InlineData(14)]
+    [InlineData(15)]
+    public void IsAwaitingMark_WhenNotExceedTwoHours_ReturnsFalse(int hours)
     {
-        var timeAfterEnd = new DateTime(2016, 1, 1, 13, minutes, 0, DateTimeKind.Utc);
+        var timeAfterEnd = new DateTime(2016, 1, 1, hours, 0, 0, DateTimeKind.Utc);
         Assert.False(_lesson.IsAwaitingMark(timeAfterEnd));
     }
     [Theory]
@@ -60,17 +59,21 @@ public class LessonTests
     public void IsAwaitingMark_WhenCanceled_ReturnsFalse()
     {
         _lesson.Cancel();
-        Assert.False(_lesson.IsAwaitingMark(Date + TimeSpan.FromHours(1.6)));
+        Assert.False(_lesson.IsAwaitingMark(Date + TimeSpan.FromHours(3)));
     }
     
     [Fact]
     public void IsAwaitingMark_WhenCompleted_ReturnsFalse()
     {
         _lesson.Complete();
-        Assert.False(_lesson.IsAwaitingMark(Date + TimeSpan.FromHours(1.6)));
+        Assert.False(_lesson.IsAwaitingMark(Date + TimeSpan.FromHours(3)));
     }
-    
-    
+
+    [Fact]
+    public void EnsureCorrectDuration_WhenLessonLong_Throws()
+    {
+        Assert.Throws<DomainException>( () => new Lesson(Guid.CreateVersion7(), Guid.CreateVersion7(), Date, TimeSpan.FromHours(8)));
+    }
     
     [Fact]
     public void Complete_WhenPlanned_SetsCompleted()
