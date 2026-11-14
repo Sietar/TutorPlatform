@@ -76,7 +76,7 @@ public class Lesson
 
         if (duration > TimeSpan.FromHours(6))
         {
-            throw new DomainException("Duration must be less than 6 hours.");
+            throw new DomainException("Duration cannot exceed 6 hours.");
         }
     }
 
