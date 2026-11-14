@@ -17,7 +17,7 @@ public class Homework
     public string? MaterialsUrl { get; private set; }
     public bool IsOverdue (DateTime now) => (Status == HomeworkStatus.Assigned || Status == HomeworkStatus.Returned) && now > DueDate;
 
-    public Homework(Guid teacherId, Guid studentId, string title, string? description, DateTime createdAt, DateTime dueDate, string materialsUrl = "")
+    public Homework(Guid teacherId, Guid studentId, string title, string? description, DateTime createdAt, DateTime dueDate, string? materialsUrl = null)
     {
         Id = Guid.CreateVersion7();
         if (teacherId == Guid.Empty)
