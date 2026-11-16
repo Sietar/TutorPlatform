@@ -18,7 +18,9 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddAuthorization();
 
 builder.Services.AddIdentityApiEndpoints<ApplicationUser>()
+    .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>();
+    
 
 builder.Services.AddExceptionHandler<ApiExceptionHandler>();
 
@@ -42,4 +44,8 @@ app.MapIdentityApi<ApplicationUser>();
 
 app.MapControllers().RequireAuthorization();
 
+app.SeedIdentityAsync();
+
 app.Run();
+
+

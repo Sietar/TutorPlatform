@@ -433,7 +433,22 @@ namespace TutorPlatform.Api.Migrations
                         .HasForeignKey("TeacherId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("TutorPlatform.Api.Auth.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("Teacher");
+                });
+
+            modelBuilder.Entity("TutorPlatform.Core.Entities.Teacher", b =>
+                {
+                    b.HasOne("TutorPlatform.Api.Auth.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("TutorPlatform.Core.Entities.Teacher", b =>
