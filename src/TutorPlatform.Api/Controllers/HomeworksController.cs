@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using TutorPlatform.Api.Auth;
 using TutorPlatform.Api.Contracts;
 using TutorPlatform.Api.Data;
 using TutorPlatform.Core.Entities;
@@ -9,9 +11,10 @@ namespace TutorPlatform.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class HomeworksController (AppDbContext db) : ControllerBase
+public class HomeworksController (AppDbContext db, CurrentUser currentUser) : ControllerBase
 {
     [HttpGet]
+    [Authorize(Roles = $"{Roles.Teacher},{Roles.Student}")]
     public async Task<ActionResult<List<HomeworkResponse>>> Get(
         [FromQuery] Guid? studentId, [FromQuery] Guid? teacherId)
     {
@@ -41,6 +44,7 @@ public class HomeworksController (AppDbContext db) : ControllerBase
     }
 
     [HttpGet("{id:guid}")]
+    [Authorize(Roles = $"{Roles.Teacher},{Roles.Student}")]
     public async Task<ActionResult<HomeworkResponse>> GetById(Guid id)
     {
         var now = DateTime.UtcNow;
@@ -55,6 +59,7 @@ public class HomeworksController (AppDbContext db) : ControllerBase
     }
     
     [HttpPost]
+    [Authorize(Roles = Roles.Teacher)]
     public async Task<ActionResult<HomeworkResponse>> Create(CreateHomeworkRequest request)
     {
         var now = DateTime.UtcNow;
@@ -86,6 +91,7 @@ public class HomeworksController (AppDbContext db) : ControllerBase
     }
 
     [HttpPost("{id:guid}/submit")]
+    [Authorize(Roles = Roles.Student)]
     public async Task<ActionResult<HomeworkResponse>> Submit(Guid id, SubmitRequest request)
     {
         var now = DateTime.UtcNow;
@@ -103,6 +109,7 @@ public class HomeworksController (AppDbContext db) : ControllerBase
     }
 
     [HttpPost("{id:guid}/complete")]
+    [Authorize(Roles = Roles.Teacher)]
     public async Task<ActionResult<HomeworkResponse>> Complete(Guid id)
     {
         var now = DateTime.UtcNow;
@@ -120,6 +127,7 @@ public class HomeworksController (AppDbContext db) : ControllerBase
     }
     
     [HttpPost("{id:guid}/return")]
+    [Authorize(Roles = Roles.Teacher)]
     public async Task<ActionResult<HomeworkResponse>> Return(Guid id, ReturnRequest request)
     {
         var now = DateTime.UtcNow;
@@ -137,6 +145,7 @@ public class HomeworksController (AppDbContext db) : ControllerBase
     }
 
     [HttpPost("{id:guid}/cancel")]
+    [Authorize(Roles = Roles.Teacher)]
     public async Task<ActionResult<HomeworkResponse>> Cancel(Guid id)
     {
         var now = DateTime.UtcNow;

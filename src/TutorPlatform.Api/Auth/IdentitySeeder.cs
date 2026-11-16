@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using TutorPlatform.Api.Data;
-using TutorPlatform.Core;
 using TutorPlatform.Core.Entities;
 
 namespace TutorPlatform.Api.Auth;

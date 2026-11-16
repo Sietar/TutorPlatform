@@ -1,3 +1,11 @@
-﻿namespace TutorPlatform.Api.Contracts;
+﻿using TutorPlatform.Core.Entities;
 
-public record StudentResponse(Guid Id, string Name);
+namespace TutorPlatform.Api.Contracts;
+
+public record StudentResponse(Guid Id, string Name)
+{
+    public static StudentResponse From(Student student)
+    {
+        return new StudentResponse(student.Id, student.Name);
+    }
+}

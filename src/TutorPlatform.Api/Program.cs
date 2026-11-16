@@ -20,7 +20,9 @@ builder.Services.AddAuthorization();
 builder.Services.AddIdentityApiEndpoints<ApplicationUser>()
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>();
-    
+
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<CurrentUser>();
 
 builder.Services.AddExceptionHandler<ApiExceptionHandler>();
 

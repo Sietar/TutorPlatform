@@ -1,3 +1,3 @@
 ﻿namespace TutorPlatform.Api.Contracts;
 
-public record AddStudentRequest(string UserId, string Name);
+public record AddStudentRequest(string Email, string Name);

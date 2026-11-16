@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using TutorPlatform.Api.Auth;
 using TutorPlatform.Api.Contracts;
 using TutorPlatform.Api.Data;
 using TutorPlatform.Core;
@@ -10,9 +12,10 @@ namespace TutorPlatform.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class LessonsController (AppDbContext db) : ControllerBase
+public class LessonsController (AppDbContext db, CurrentUser currentUser) : ControllerBase
 {
     [HttpGet]
+    [Authorize(Roles = $"{Roles.Teacher},{Roles.Student}")]
     public async Task<ActionResult<List<LessonResponse>>> Get(
         [FromQuery] Guid teacherId, [FromQuery] DateTime from, [FromQuery] DateTime to)
     {
@@ -37,6 +40,7 @@ public class LessonsController (AppDbContext db) : ControllerBase
     }
 
     [HttpGet("{id:guid}")]
+    [Authorize(Roles = $"{Roles.Teacher},{Roles.Student}")]
     public async Task<ActionResult<LessonResponse>> GetById(Guid id)
     {
         var lesson = await db.Lessons
@@ -50,6 +54,7 @@ public class LessonsController (AppDbContext db) : ControllerBase
     }
     
     [HttpPost]
+    [Authorize(Roles = Roles.Teacher)]
     public async Task<ActionResult<LessonResponse>> Create(CreateLessonRequest request)
     {
         var studentExists = await db.Students.AnyAsync(s => s.Id == request.StudentId);
@@ -85,6 +90,7 @@ public class LessonsController (AppDbContext db) : ControllerBase
     }
     
     [HttpPost("{id:guid}/complete")]
+    [Authorize(Roles = Roles.Teacher)]
     public async Task<ActionResult<LessonResponse>> Complete(Guid id)
     {
         var lesson = await db.Lessons.FindAsync(id);
@@ -100,6 +106,7 @@ public class LessonsController (AppDbContext db) : ControllerBase
     }
     
     [HttpPost("{id:guid}/cancel")]
+    [Authorize(Roles = Roles.Teacher)]
     public async Task<ActionResult<LessonResponse>> Cancel(Guid id)
     {
         var lesson = await db.Lessons.FindAsync(id);
@@ -115,6 +122,7 @@ public class LessonsController (AppDbContext db) : ControllerBase
     }
 
     [HttpPost("{id:guid}/reschedule")]
+    [Authorize(Roles = Roles.Teacher)]
     public async Task<ActionResult<LessonResponse>> Reschedule(Guid id, RescheduleLessonRequest request)
     {
         var lesson = await db.Lessons.FindAsync(id);
