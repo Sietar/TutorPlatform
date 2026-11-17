@@ -11,44 +11,30 @@ using TutorPlatform.Core.Entities;
 namespace TutorPlatform.Api.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/[controller]/me/students")]
 public class TeachersController(
     AppDbContext db,
     CurrentUser currentUser,
     UserManager<ApplicationUser> userManager) : ControllerBase
 {
-    [HttpGet]
-    [Authorize(Roles = $"{Roles.Teacher},{Roles.Student}")]
-    public async Task<ActionResult<List<TeacherResponse>>> GetAll()
-    {
-        var teachers = await db.Teachers
-            .AsNoTracking()
-            .Select(t => new TeacherResponse(t.Id, t.Name))
-            .ToListAsync();
-
-        return Ok(teachers);
-    }
-    
-    [HttpGet("{id:guid}")]
-    [Authorize(Roles = $"{Roles.Teacher},{Roles.Student}")]
-    public async Task<ActionResult<TeacherResponse>> GetById(Guid id)
-    {
-        var teacher = await db.Teachers
-            .AsNoTracking()
-            .Where(t => t.Id == id)
-            .Select(t => new TeacherResponse(t.Id, t.Name))
-            .FirstOrDefaultAsync();
-
-        return teacher is null ? NotFound() : Ok(teacher);
-    }
-
-    [HttpGet("{teacherId:guid}/students")]
-    [Authorize(Roles = $"{Roles.Teacher},{Roles.Student}")]
+    [HttpGet("me/students")]
+    [Authorize(Roles = $"{Roles.Teacher}")]
     public async Task<ActionResult<List<StudentResponse>>> GetStudents(Guid teacherId)
     {
         if (!await db.Teachers.AnyAsync(t => t.Id == teacherId))
         {
             return NotFound();
+        }
+        
+        var userId = await currentUser.GetTeacherIdAsync();
+        if (userId is null)
+        {
+            return Forbid();
+        }
+
+        if (userId != teacherId)
+        {
+            return Forbid();
         }
         
         var students = await db.Students
@@ -62,7 +48,7 @@ public class TeachersController(
         return Ok(students);
     }
 
-    [HttpPost("me/students")]
+    [HttpPost("")]
     [Authorize(Roles = Roles.Teacher)]
     public async Task<ActionResult<StudentResponse>> AddStudent(AddStudentRequest request)
     {
